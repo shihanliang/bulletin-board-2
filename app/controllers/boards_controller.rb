@@ -1,7 +1,8 @@
 class BoardsController < ApplicationController
+  before_action :authenticate_user!, only: [:create, :update, :destroy]
+
   def index
     matching_boards = Board.all
-
     @list_of_boards = matching_boards.order({ :created_at => :desc })
 
     render({ :template => "boards/index" })
@@ -9,15 +10,11 @@ class BoardsController < ApplicationController
 
   def show
     the_id = params.fetch("path_id")
-
     matching_boards = Board.where({ :id => the_id })
-
     @the_board = matching_boards.at(0)
 
     @matching_posts = Post.where({ :board_id => @the_board.id })
-
     @active_posts = @matching_posts.where({ :expires_on => (Time.current...) }).order(:expires_on)
-    
     @expired_posts = @matching_posts.where.not({ :expires_on => (Time.current...) }).order({ :expires_on => :desc })
 
     render({ :template => "boards/show" })
@@ -26,6 +23,7 @@ class BoardsController < ApplicationController
   def create
     the_board = Board.new
     the_board.name = params.fetch("query_name")
+    the_board.user_id = current_user.id  # ✅ 保存当前登录用户的 ID
 
     if the_board.valid?
       the_board.save
@@ -43,7 +41,7 @@ class BoardsController < ApplicationController
 
     if the_board.valid?
       the_board.save
-      redirect_to("/boards/#{the_board.id}", { :notice => "Board updated successfully."} )
+      redirect_to("/boards/#{the_board.id}", { :notice => "Board updated successfully." })
     else
       redirect_to("/boards/#{the_board.id}", { :alert => the_board.errors.full_messages.to_sentence })
     end
@@ -55,6 +53,6 @@ class BoardsController < ApplicationController
 
     the_board.destroy
 
-    redirect_to("/boards", { :notice => "Board deleted successfully."} )
+    redirect_to("/boards", { :notice => "Board deleted successfully." })
   end
 end

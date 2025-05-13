@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
-  get("/", { :controller => "boards", :action => "index" })
+  # Devise routes
+  devise_for :users
+
+  # Set the root route (Devise expects this syntax)
+  root "boards#index"
 
   # Routes for the Post resource:
 
@@ -8,17 +12,13 @@ Rails.application.routes.draw do
           
   # READ
   get("/posts", { :controller => "posts", :action => "index" })
-  
   get("/posts/:path_id", { :controller => "posts", :action => "show" })
   
   # UPDATE
-  
   post("/modify_post/:path_id", { :controller => "posts", :action => "update" })
   
   # DELETE
   get("/delete_post/:path_id", { :controller => "posts", :action => "destroy" })
-
-  #------------------------------
 
   # Routes for the Board resource:
 
@@ -27,20 +27,11 @@ Rails.application.routes.draw do
           
   # READ
   get("/boards", { :controller => "boards", :action => "index" })
-  
   get("/boards/:path_id", { :controller => "boards", :action => "show" })
   
   # UPDATE
-  
   post("/modify_board/:path_id", { :controller => "boards", :action => "update" })
   
   # DELETE
   get("/delete_board/:path_id", { :controller => "boards", :action => "destroy" })
-
-  #------------------------------
-
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Defines the root path route ("/")
-  # root "articles#index"
 end

@@ -1,7 +1,8 @@
 class PostsController < ApplicationController
+  before_action :authenticate_user!, only: [:create, :update, :destroy]
+
   def index
     matching_posts = Post.all
-
     @list_of_posts = matching_posts.order({ :created_at => :desc })
 
     render({ :template => "posts/index" })
@@ -9,9 +10,7 @@ class PostsController < ApplicationController
 
   def show
     the_id = params.fetch("path_id")
-
     matching_posts = Post.where({ :id => the_id })
-
     @the_post = matching_posts.at(0)
 
     render({ :template => "posts/show" })
@@ -23,6 +22,7 @@ class PostsController < ApplicationController
     the_post.body = params.fetch("query_body")
     the_post.expires_on = params.fetch("query_expires_on")
     the_post.board_id = params.fetch("query_board_id")
+    the_post.user_id = current_user.id  # ✅ 设置当前登录用户为作者
 
     if the_post.valid?
       the_post.save
@@ -43,7 +43,7 @@ class PostsController < ApplicationController
 
     if the_post.valid?
       the_post.save
-      redirect_to("/posts/#{the_post.id}", { :notice => "Post updated successfully."} )
+      redirect_to("/posts/#{the_post.id}", { :notice => "Post updated successfully." })
     else
       redirect_to("/posts/#{the_post.id}", { :alert => the_post.errors.full_messages.to_sentence })
     end
@@ -55,6 +55,6 @@ class PostsController < ApplicationController
 
     the_post.destroy
 
-    redirect_to("/posts", { :notice => "Post deleted successfully."} )
+    redirect_to("/posts", { :notice => "Post deleted successfully." })
   end
 end

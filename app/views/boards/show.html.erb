@@ -13,6 +13,8 @@
 </h2>
 
 <form action="/insert_post" method="post">
+  <%= csrf_meta_tags %>
+
   <div>
     <label for="title_box">
       Title
@@ -54,6 +56,7 @@
     <th>Body</th>
     <th>Posted on</th>
     <th>Expires on</th>
+    <th>Actions</th>
   </tr>
 
   <% @active_posts.each do |a_post| %>
@@ -62,6 +65,11 @@
       <td><%= a_post.body %></td>
       <td><%= a_post.created_at.strftime("%b %e, %Y") %></td>
       <td><%= a_post.expires_on.strftime("%b %e, %Y") %></td>
+      <td>
+        <% if current_user && current_user.id == a_post.user_id %>
+          <a href="/delete_post/<%= a_post.id %>">Delete post</a>
+        <% end %>
+      </td>
     </tr>
   <% end %>
 </table>
@@ -74,6 +82,7 @@
     <th>Body</th>
     <th>Posted on</th>
     <th>Expired on</th>
+    <th>Actions</th>
   </tr>
 
   <% @expired_posts.each do |a_post| %>
@@ -82,6 +91,11 @@
       <td><%= a_post.body %></td>
       <td><%= a_post.created_at.strftime("%b %e, %Y") %></td>
       <td><%= a_post.expires_on.strftime("%b %e, %Y") %></td>
+      <td>
+        <% if current_user && current_user.id == a_post.user_id %>
+          <a href="/delete_post/<%= a_post.id %>">Delete post</a>
+        <% end %>
+      </td>
     </tr>
   <% end %>
 </table>
